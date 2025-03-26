@@ -15,12 +15,12 @@ mod_roleNeutral_ui <- function(id) {
   ns <- NS(id)
   tabPanel(title = "Neutral",
            sidebarLayout(
-             fluid = FALSE,
+             fluid = TRUE,
              sidebarPanel(
-               mod_roleControls_ui(ns(id)),
                mod_roleParamsNeutral_ui(ns(id)),
                #mod_rolePlotSelects_ui(ns(id)),
-               width = 3
+               width = 4,
+               mod_roleControls_ui(ns(id))
              ),
              
              mainPanel(h2("Plots"),
