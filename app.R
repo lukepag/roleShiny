@@ -25,12 +25,11 @@ ui <- fluidPage(
         gap: 10px;
         flex-grow: 1;
       }
-      .param-row .shiny-input-container {
-        flex-grow: 1;
-        min-width: 100px;
-        max-width: 250px;
+      .param-inputs input[type='number'] { /* Style numericInput */
+        width: 100px;
+        margin-right: 10px;
       }
-      .param-row .shiny-slider-container {
+      .param-inputs .irs { /* Style sliderInput */
         flex-grow: 2;
       }
     "))

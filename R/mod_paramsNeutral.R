@@ -4,9 +4,9 @@
 #'
 #' @param id,input,output,session Internal parameters for {shiny}.
 #'
-#' @noRd 
+#' @noRd
 #'
-#' @import shiny 
+#' @import shiny
 #' @importFrom shinyBS bsTooltip bsButton
 
 roleParamRow <- function(id, name, label = "", min = 0, max = 100000, value = 100, tip = "", isGreek = FALSE) {
@@ -15,6 +15,7 @@ roleParamRow <- function(id, name, label = "", min = 0, max = 100000, value = 10
   
   div(
     class = "param-row",
+    style = "display: flex; align-items: center;", # Add flexbox styling here
     HTML(paste(opener, label, "</div>")),
     div(class = "param-inputs",
         numericInput(ns(paste0(name, "_t")), label = NULL, min = min, max = max, value = value, width = "100px"),
@@ -40,37 +41,47 @@ roleParamDrop <- function(id, name, label = NULL, selected = "oceanic_island", t
 
 # Parameter defaults
 max_jm <- 10000; value_jm <- 1000
-max_j  <- 1000;  value_j  <- 100
-max_sm <- 1000;  value_sm <- 100
-max_nu <- 0.5;   value_nu <- 0.01
-max_m  <- 1.0;   value_m  <- 0.2
+max_j <- 1000; value_j <- 100
+max_sm <- 1000; value_sm <- 100
+max_nu <- 0.5;  value_nu <- 0.01
+max_m <- 1.0;  value_m <- 0.2
 max_iter <- 10000; value_iter <- 1000
 
 mod_roleParamsNeutral_ui <- function(id, button) {
   ns <- NS(id)
   imageOutput(ns("logo"))
   
-  div(
-    h2("Parameters"),
-    roleParamDrop(id, "type", "Initialization Type", tip = "Initialization routine"),
-    roleParamRow(id, "jm", "J<sub>m</sub>", 0, max_jm, value_jm, "Number of individuals in the metacommunity"),
-    roleParamRow(id, "sm", "S<sub>m</sub>", 0, max_sm, value_sm, "Number of species in the metacommunity"),
-    roleParamRow(id, "j",  "J",          0, max_j, value_j, "Number of individuals in the local community"),
-    roleParamRow(id, "nu", "&#957;",     0, max_nu, value_nu, "The probability of local speciation", isGreek = TRUE),
-    roleParamRow(id, "m",  "m",          0, max_m, value_m, "The local dispersal probability"),
-    roleParamRow(id, "iter", "n<sub>iter</sub>", 1, max_iter, value_iter, "The number of iterations to run")
+  tagList( # Added tagList to wrap everything
+    tags$head(
+      tags$style(HTML("
+        .param-label {
+          width: 150px; /* Adjust the width as needed */
+          margin-right: 10px; /* Add some spacing between the label and inputs */
+        }
+      "))
+    ),
+    div(
+      h2("Parameters"),
+      roleParamDrop(id, "type", "Initialization Type", tip = "Initialization routine"),
+      roleParamRow(id, "jm", "J<sub>m</sub>", 0, max_jm, value_jm, "Number of individuals in the metacommunity"),
+      roleParamRow(id, "sm", "S<sub>m</sub>", 0, max_sm, value_sm, "Number of species in the metacommunity"),
+      roleParamRow(id, "j", "J",     0, max_j, value_j, "Number of individuals in the local community"),
+      roleParamRow(id, "nu", "&#957;",   0, max_nu, value_nu, "The probability of local speciation", isGreek = TRUE),
+      roleParamRow(id, "m", "m",     0, max_m, value_m, "The local dispersal probability"),
+      roleParamRow(id, "iter", "n<sub>iter</sub>", 1, max_iter, value_iter, "The number of iterations to run")
+    )
   )
 }
 
 #' roleParams Server Functions
 #'
-#' @noRd 
+#' @noRd
 mod_roleParamsNeutral_server <- function(id) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
     
-    output$logo <- renderImage({ 
-      list(src = "imgs/ROLE-logo.png", height = "65%") 
+    output$logo <- renderImage({
+      list(src = "imgs/ROLE-logo.png", height = "65%")
     }, deleteFile = FALSE)
     
     # Sync sliders and numeric inputs
