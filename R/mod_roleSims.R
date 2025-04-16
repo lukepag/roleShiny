@@ -31,7 +31,6 @@ mod_roleSims_ui <- function(id){
 mod_roleSims_server <- function(id, sims_out, is_neutral = TRUE){
   moduleServer( id, function(input, output, session){
     ns <- session$ns
-    print("not reactive testing")
 
     
     s <- reactive({
@@ -80,14 +79,11 @@ mod_roleSims_server <- function(id, sims_out, is_neutral = TRUE){
         m <- roleR::runRole(exp)
       }
       # shinybusy::remove_modal_spinner()
-      print(params)
-      print(exp)
-      print(typeof(m))
-      print("outside all testing")
       return(m)
       
     }) %>%
-      bindEvent(input$playBtn)
+      # bindEvent(input$playBtn)
+      bindEvent(input$runBtn)
 
     # observeEvent(input$playBtn, {
     #   print(m)

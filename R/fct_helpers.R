@@ -103,10 +103,11 @@ gg_scatter <- function(dat, dat_2, yvar, is_abund = TRUE) {
     y_lims <- c(min(dat$traits), max(dat$traits))
     y_lab = "Trait"
   }
-  
+  # print(dat_2)
+  # print(length(dat_2$iteration))
   p <- ggplot() +
     geom_line(data = dat, aes_string(x = "rank", y = yvar, group = "gen"), color = "lightgrey", alpha = 0.1) +
-    geom_point(data = dat, aes_string(x = "rank", y = yvar, group = "gen",  frame = "gen"), color = "#107361", alpha = 1.0) +
+    geom_point(data = dat, aes_string(x = "rank", y = yvar, group = "gen",  frame = "gen"), color = "#107361" , alpha = 1.0) +
     labs(x = "Rank", y = y_lab, color = "Generation") +
     #ylim(y = y_lims) + 
     theme_bw()  +
@@ -124,7 +125,7 @@ gg_scatter <- function(dat, dat_2, yvar, is_abund = TRUE) {
   l_int <- ggplotly(l)
   
   
-  p_fin <- subplot(p_int, l_int) |>
+  p_fin <- subplot(p_int, l_int)|>
     animation_slider(currentvalue = list(prefix = "Gen = ", font = list(color = "black")))
   
   shinybusy::remove_modal_spinner()
