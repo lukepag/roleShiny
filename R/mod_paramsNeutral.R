@@ -11,18 +11,20 @@
 
 roleParamRow <- function(id, name, label = "", min = 0, max = 100000, value = 100, tip = "", isGreek = FALSE) {
   ns <- NS(id)
-  opener = if (isGreek) '<div class="param-label greek">' else '<div class="param-label">'
+  opener <- if (isGreek) '<div class="param-label greek">' else '<div class="param-label">'
   
   div(
-    class = "param-row",
-    style = "display: flex; align-items: center;", # Add flexbox styling here
-    HTML(paste(opener, label, "</div>")),
-    div(class = "param-inputs",
-        numericInput(ns(paste0(name, "_t")), label = NULL, min = min, max = max, value = value, width = "100px"),
-        sliderInput(ns(name), label = NULL, min = min, max = max, value = value, ticks = FALSE, width = "100%")
-    ),
-    shinyBS::bsTooltip(ns(name), tip),
-    shinyBS::bsTooltip(ns(paste0(name, "_t")), tip)
+    class = "form-inline",  # ← prevents form layout from inserting spacing
+    div(
+      class = "param-row",
+      HTML(paste0(opener, label, "</div>")),
+      div(class = "param-inputs",
+          numericInput(ns(paste0(name, "_t")), label = NULL, min = min, max = max, value = value, width = "80px"),
+          sliderInput(ns(name), label = NULL, min = min, max = max, value = value, ticks = FALSE, width = "100%")
+      ),
+      shinyBS::bsTooltip(ns(name), tip),
+      shinyBS::bsTooltip(ns(paste0(name, "_t")), tip)
+    )
   )
 }
 
@@ -49,27 +51,16 @@ max_iter <- 10000; value_iter <- 1000
 
 mod_roleParamsNeutral_ui <- function(id, button) {
   ns <- NS(id)
-  imageOutput(ns("logo"))
   
-  tagList( # Added tagList to wrap everything
-    tags$head(
-      tags$style(HTML("
-        .param-label {
-          width: 150px; /* Adjust the width as needed */
-          margin-right: 10px; /* Add some spacing between the label and inputs */
-        }
-      "))
-    ),
-    div(
-      h2("Parameters"),
-      roleParamDrop(id, "type", "Initialization Type", tip = "Initialization routine"),
-      roleParamRow(id, "jm", "J<sub>m</sub>", 0, max_jm, value_jm, "Number of individuals in the metacommunity"),
-      roleParamRow(id, "sm", "S<sub>m</sub>", 0, max_sm, value_sm, "Number of species in the metacommunity"),
-      roleParamRow(id, "j", "J",     0, max_j, value_j, "Number of individuals in the local community"),
-      roleParamRow(id, "nu", "&#957;",   0, max_nu, value_nu, "The probability of local speciation", isGreek = TRUE),
-      roleParamRow(id, "m", "m",     0, max_m, value_m, "The local dispersal probability"),
-      roleParamRow(id, "iter", "n<sub>iter</sub>", 1, max_iter, value_iter, "The number of iterations to run")
-    )
+  tagList(
+    h2("Parameters", style = "margin-top: 0; margin-bottom: 15px;"),
+    roleParamDrop(id, "type", "Initialization Type", tip = "Initialization routine"),
+    roleParamRow(id, "jm", "J<sub>m</sub>", 0, max_jm, value_jm, "Number of individuals in the metacommunity"),
+    roleParamRow(id, "sm", "S<sub>m</sub>", 0, max_sm, value_sm, "Number of species in the metacommunity"),
+    roleParamRow(id, "j", "J",     0, max_j, value_j, "Number of individuals in the local community"),
+    roleParamRow(id, "nu", "&#957;",   0, max_nu, value_nu, "The probability of local speciation", isGreek = TRUE),
+    roleParamRow(id, "m", "m",     0, max_m, value_m, "The local dispersal probability"),
+    roleParamRow(id, "iter", "n<sub>iter</sub>", 1, max_iter, value_iter, "The number of iterations to run")
   )
 }
 
@@ -79,10 +70,6 @@ mod_roleParamsNeutral_ui <- function(id, button) {
 mod_roleParamsNeutral_server <- function(id) {
   moduleServer(id, function(input, output, session) {
     ns <- session$ns
-    
-    output$logo <- renderImage({
-      list(src = "imgs/ROLE-logo.png", height = "65%")
-    }, deleteFile = FALSE)
     
     # Sync sliders and numeric inputs
     observe(updateNumericInput(session, "jm_t", value = input$jm)) %>% bindEvent(input$jm)
