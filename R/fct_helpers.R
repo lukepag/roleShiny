@@ -9,6 +9,9 @@
 
 library(dplyr)
 library(ggtree)
+library(ggplot2)
+library(plotly)
+library(cowplot)
 
 # function to get the date and time in a reasonable format to append to the end of files for a unique filename
 file_suffix <- function() {
@@ -80,55 +83,41 @@ tidy_raw_rank <- function(ss, raw_string) {
 # plotting functions to make plotting easier
 ## scatterplot
 gg_scatter <- function(dat, dat_2, yvar, is_abund = TRUE) {
+  # Define y-axis label
+  y_lab <- ifelse(is_abund, "Abundance", "Other Metric")
   
-  # select fewer generations to make plotting easier
-  if (length(unique(dat$gen)) > 150) {
-    g <- unique(dat$gen)  
-    g_first <- g[1] # keep the first generation
-    g_last <- g[length(g)] # keep the last generation
-    g_rest <- g[-1] # sample from all except the first generation
-    s_g <- sample(g_rest, 100, replace = FALSE) # sample from the generations
-    s_g <- c(g_first, s_g, g_last)
-    
-    dat <- dat[dat$gen %in% s_g,] # filter for the sampled generations
-    
-  }
-  
-  
-  
-  if (is_abund) {
-    y_lims <- c(min(dat$abund), max(dat$abund))
-    y_lab <- "Abundance"
-  } else {
-    y_lims <- c(min(dat$traits), max(dat$traits))
-    y_lab = "Trait"
-  }
-  
-  p <- ggplot() +
-    geom_line(data = dat, aes_string(x = "rank", y = yvar, group = "gen"), color = "lightgrey", alpha = 0.1) +
-    geom_point(data = dat, aes_string(x = "rank", y = yvar, group = "gen",  frame = "gen"), color = "#107361", alpha = 1.0) +
-    labs(x = "Rank", y = y_lab, color = "Generation") +
-    #ylim(y = y_lims) + 
-    theme_bw()  +
+  # Rank-abundance plot (left plot, static) - we'll handle this separately
+  p <- ggplot(dat, aes_string(x = "rank", y = yvar, group = "gen")) +
+    geom_point(color = "#107361", size = 2) +
+    labs(x = "", y = y_lab) +
+    theme_bw() +
     theme(legend.key.size = unit(3, "mm"))
   
-  p_int <- ggplotly(p) 
+  # Time graph with growing line animation (right plot)
+  # Create cumulative dataset for line growth
+  dat_cumulative <- do.call(rbind, lapply(unique(dat_2$gen), function(g) {
+    subset <- dat_2[dat_2$gen <= g, c("gen", "hillAbund_1"), drop = FALSE]
+    subset$frame <- g  # Assign frame as the current generation
+    return(subset)
+  }))
   
-  l <- ggplot() +
-    geom_line(data = dat_2, aes_string(x = "gen", y = "hillAbund_1"), color = "black", alpha = 1.0) +
-    geom_point(data = dat_2, aes_string(x = "gen", y = "hillAbund_1", frame = "gen"), color = "#107361", alpha = 1.0) +
-    labs(x = "Generation", y = y_lab) +
-    theme_bw()  +
-    theme(legend.key.size = unit(3, "mm"))
+  # Add initial point at (0,0) for frame 0
+  initial_point <- data.frame(gen = 0, hillAbund_1 = 0, frame = 0)
+  dat_cumulative <- rbind(initial_point, dat_cumulative)
   
-  l_int <- ggplotly(l)
+  # Time plot: growing line and current point
+  l <- ggplot(dat_cumulative) +
+    geom_line(aes(x = gen, y = hillAbund_1, group = 1), color = "black", alpha = 1.0) +
+    geom_point(data = dat_cumulative[dat_cumulative$gen == dat_cumulative$frame, ],
+               aes(x = gen, y = hillAbund_1), color = "#107361", size = 3) +
+    labs(x = "Generation", y = "Hill Abundance 1") +
+    theme_bw() +
+    theme(legend.key.size = unit(3, "mm")) +
+    transition_states(frame, transition_length = 0, state_length = 1) +
+    labs(title = "Gen: {closest_state}")
   
-  
-  p_fin <- subplot(p_int, l_int) |>
-    animation_slider(currentvalue = list(prefix = "Gen = ", font = list(color = "black")))
-  
-  shinybusy::remove_modal_spinner()
-  return(p_fin)
+  # Return only the animated time plot for now
+  return(l)
 }
 
 ## timeseries
