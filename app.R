@@ -27,6 +27,7 @@ ui <- fluidPage(
         margin-right: 5px;
         white-space: nowrap;
         min-width: 25px;
+        max-width: 25px;
         text-align: right;
       }
 
