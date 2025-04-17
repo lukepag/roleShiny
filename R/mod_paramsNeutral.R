@@ -55,6 +55,7 @@ mod_roleParamsNeutral_ui <- function(id, button) {
   tagList(
     h2("Parameters", style = "margin-top: 0; margin-bottom: 15px;"),
     roleParamDrop(id, "type", "Initialization Type", tip = "Initialization routine"),
+    h1("", style = "margin-top: 0; margin-bottom: 15px;"),
     roleParamRow(id, "jm", "J<sub>m</sub>", 0, max_jm, value_jm, "Number of individuals in the metacommunity"),
     roleParamRow(id, "sm", "S<sub>m</sub>", 0, max_sm, value_sm, "Number of species in the metacommunity"),
     roleParamRow(id, "j", "J",     0, max_j, value_j, "Number of individuals in the local community"),
