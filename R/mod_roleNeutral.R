@@ -13,8 +13,8 @@ mod_roleNeutral_ui <- function(id) {
   sidebarLayout(
     fluid = TRUE,
     sidebarPanel(
-      mod_roleParamsNeutral_ui(ns(id)),
       mod_roleControls_ui(ns(id)),
+      mod_roleParamsNeutral_ui(ns(id)),
       width = 4
     ),
     mainPanel(
