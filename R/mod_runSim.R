@@ -14,14 +14,8 @@ mod_roleControls_ui <- function(id){
   ns <- NS(id)
   tagList(
     div(
-      #h2("Run the simulation"),
-      #actionButton(ns("playBtn"), icon("play"), class = "btn-primary btn-lg"),
-      # downloadButton(ns("importBtn"), "Import Data", class = "disabled navbar-btn", icon("upload")),
-      #downloadButton(ns("downloadTest"), "testing", class = "disabled navbar-btn"),
       actionButton(ns("importBtn"), "Import Data", icon("upload"), width = "48%", class = "btn-primary"),
       actionButton(ns("runBtn"), "Run Simulation", width = "48%", class = "btn-primary"),
-      # actionButton(ns("pauseBtn"), icon("pause")),
-      # actionButton(ns("nextBtn"), icon("step-forward")),
       
       # shinyBS::bsTooltip(ns("playBtn"), "Play the simulation", placement = "center", trigger = "hover"),
       # shinyBS::bsTooltip(ns("pauseBtn"), "Pause the simulation", placement = "bottom", trigger = "hover"),

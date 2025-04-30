@@ -9,6 +9,8 @@
 #' @import shiny 
 #' @importFrom shinyBS bsTooltip bsButton
 
+library(dplyr)
+
 # slider input
 roleParam <- function(id, name, label = "", min = 0, max = 100000, value = 100, tip = "", isGreek = FALSE) {
   ns <- NS(id)
@@ -210,8 +212,10 @@ mod_roleParamsNeutral_ui <- function(id, button) {
       min = 10,
       max = max_iter,
       value = value_iter
-    )
-      
+    ),
+    
+    downloadButton(ns("downloadBtn"), "Export Parameters", class = "navbar-btn")
+    
   )
 }
 
@@ -231,14 +235,13 @@ mod_roleParamsNeutral_server <- function(id) {
     # Unfortunately, I can't wrap the observe() calls in a function to make this more succinct
     
     ##### Common params ####
-    
     #### Jm slider ####
     
-    observe(
+    observe({
       updateNumericInput(session,
                          inputId = "jm_t",
                          value = input$jm)
-    ) %>%
+    }) %>%
       bindEvent(input$jm)
     
     observe(
@@ -330,6 +333,19 @@ mod_roleParamsNeutral_server <- function(id) {
     ) %>%
       bindEvent(input$iter_t)
     
+    ### Download Button and Handler ###
+    
+    output$downloadBtn <- downloadHandler(
+      filename = "roleNeutral.csv",
+      content = function(file) {
+        params <- c("jm", "sm", "j", "nu", "m", "iter", "type")
+        values <- c(input$jm, input$sm, input$j, input$nu, input$m, input$iter, input$type)
+        export <- data.frame(params, values)
+        # Write the dataset to the `file` that will be downloaded
+        write.csv(export, file, row.names = FALSE, quote = FALSE)
+        # Add in time_data and dat_formatted to a export in a zipped folder
+      }
+    )
     
   })
   

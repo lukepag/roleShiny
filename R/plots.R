@@ -79,7 +79,6 @@ mod_rolePlots_server <- function(id,
     
     
     observe({
-      # print(allSims())
       req(allSims())
       
       sumstats <- reactive({
@@ -92,7 +91,6 @@ mod_rolePlots_server <- function(id,
                                       hillTrait = roleR::hillTrait), 
                           moreArgs = list(hillAbund = list(q = 1:3)))
         ss[,"gen"] <- allSims()@info$generations
-        # print(ss)
         return(ss)
       })
       
